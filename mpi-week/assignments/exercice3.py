@@ -1,28 +1,22 @@
 from mpi4py import MPI
 
-COMM =MPI.COMM_WORLD
-SIZE =COMM.Get_size()
-RANK =COMM.Get_rank()
-"""
-if RANK==0:
-    sendbuf=int(input("write an integer "))
-    COMM.send(sendbuf, dest=1)
-else:
-    sendbuf=None
-    for i in range(1,SIZE):
-        if RANK==i:
-            recvbuf = COMM.recv(source=i-1)
-            if i!=SIZE-1:
-                sendbuf=recvbuf + i
-                COMM.send(sendbuf, dest=i+1)
-            print("I, process",i, "I received ",recvbuf," from the process",i-1)
-        
+# Initialize MPI and get the rank and size of the current process
+comm = MPI.COMM_WORLD
+rank = comm.Get_rank()
+size = comm.Get_size()
 
-"""
+
 while(1):
-    if RANK == 0:
-        x = int(input())
-        comm_world.send(x,1)
+    if rank==0:
+        x=int(input())
+        comm.send(x, rank+1)
+
     else:
-        x = co
- 
+        x = comm.recv(source = rank-1)
+        if rank< size - 1:
+            if x < 0:
+                x -= rank
+            comm.send(x + rank, rank+1)
+    if x < 0:
+        break
+    print("rank", rank, "data", x)
